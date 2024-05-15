@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 '''A module with tools for request caching and tracking.
 '''
