@@ -5,28 +5,34 @@ import redis
 import requests
 from functools import wraps
 from typing import Callable
-import time
 
 
+redis_store = redis.Redis()
+'''The module-level Redis instance.
+'''
+
+
+def data_cacher(method: Callable) -> Callable:
+    '''Caches the output of fetched data.
+    '''
+    @wraps(method)
+    def invoker(url) -> str:
+        '''The wrapper function for caching the output.
+        '''
+        redis_store.incr(f'count:{url}')
+        result = redis_store.get(f'result:{url}')
+        if result:
+            return result.decode('utf-8')
+        result = method(url)
+        redis_store.set(f'count:{url}', 0)
+        redis_store.setex(f'result:{url}', 10, result)
+        return result
+    return invoker
+
+
+@data_cacher
 def get_page(url: str) -> str:
-    # Create a Redis connection
-    redis_conn = redis.Redis()
-
-    # Check if the URL is in the cache
-    cached_content = redis_conn.get(url)
-    if cached_content:
-        # If cached content exists, return it
-        return cached_content.decode("utf-8")
-
-    # If not cached, fetch the content from the URL
-    response = requests.get(url)
-    content = response.text
-
-    # Cache the content with an expiration time of 10 seconds
-    redis_conn.setex(url, 10, content)
-
-    # Increment the access count for the URL
-    redis_conn.incr(f"count:{url}")
-
-    # Return the content
-    return content
+    '''Returns the content of a URL after caching the request's response,
+    and tracking the request.
+    '''
+    return requests.get(url).text
