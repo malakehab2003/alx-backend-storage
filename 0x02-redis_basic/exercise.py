@@ -16,6 +16,7 @@ def count_calls(method: typing.Callable) -> typing.Callable:
         return method(self, *args, **kwargs)
     return invoker
 
+
 class Cache():
     """ Cache class """
     def __init__(self) -> None:
@@ -29,8 +30,11 @@ class Cache():
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
-    
-    def get(self, key: str, fn: typing.Callable = None) -> typing.Union[str, bytes, int, float]:
+
+    def get(self,
+            key: str,
+            fn: typing.Callable = None,
+            ) -> typing.Union[str, bytes, int, float]:
         """ get function to change the returned datatype """
         value = self._redis.get(key)
         if value is None:
@@ -38,7 +42,7 @@ class Cache():
         if fn is None:
             return value
         return fn(value)
-    
+
     def get_str(self, key: str) -> str:
         """ return string """
         return self.get(key, fn=lambda x: x.decode("utf-8"))
@@ -46,7 +50,8 @@ class Cache():
     def get_int(self, key: str) -> int:
         """ return int """
         return self.get(key, fn=int)
-    
+
+
 cache = Cache()
 
 TEST_CASES = {
