@@ -3,12 +3,12 @@
 import redis
 import typing
 import uuid
-from functools import wraps
+import functools
 
 
 def count_calls(method: typing.Callable) -> typing.Callable:
     """ Tracks the number of calls made to a method in a Cache class """
-    @wraps(method)
+    @functools.wraps(method)
     def invoker(self, *args, **kwargs) -> typing.Any:
         """ Invokes the given method after incrementing its call counter """
         if isinstance(self._redis, redis.Redis):
