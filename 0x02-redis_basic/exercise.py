@@ -18,7 +18,7 @@ class Cache():
         self._redis.set(key, data)
         return key
     
-    def get(self, key: str, fn: typing.Callable) -> typing.Union[str, bytes, int, float]:
+    def get(self, key: str, fn: typing.Callable = None) -> typing.Union[str, bytes, int, float]:
         """ get function to change the returned datatype """
         value = self._redis.get(key)
         if value is None:
