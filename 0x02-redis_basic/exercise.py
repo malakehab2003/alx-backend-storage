@@ -16,7 +16,6 @@ def count_calls(method: typing.Callable) -> typing.Callable:
         return method(self, *args, **kwargs)
     return invoker
 
-
 class Cache():
     """ Cache class """
     def __init__(self) -> None:
